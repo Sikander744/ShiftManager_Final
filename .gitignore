@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Secrets - NEVER commit
+.env
+*.pem
+
+# Build output / coverage
+dist/
+coverage/
+
+# Logs and OS files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Generated submission ZIPs
+submission/
+
+# Local TLS certificates (never commit private keys)
+certs/

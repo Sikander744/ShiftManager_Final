@@ -1,0 +1,46 @@
+
+=== 1. Replica set status ===
+  localhost:27018               PRIMARY
+  localhost:27019               SECONDARY
+  localhost:27020               SECONDARY
+
+=== 2. Start the backend on the replica set ===
+Created manager: ankush12@gmail.com
+[2026-11-23T01:16:53.399Z] [INFO] MongoDB topology: ReplicaSetWithPrimary (pool size 20, readPreference primary)
+MongoDB Connected Successfully
+ShiftManager Backend Running on Port 5055 (HTTP)
+[2026-11-23T01:16:53.419Z] [INFO] Allowed client origin(s): http://localhost:5173,http://localhost:4173
+
+=== 3. Write data through the API ===
+  Created shift 6b039407e876fa3ebfabfc8a via the API (written to the PRIMARY)
+
+=== 4. Read the same shift directly from a SECONDARY (proves replication) ===
+  Found on secondary localhost:27019: Replica Test A 2099-06-01
+
+=== 5. Simulate a failure: stop the PRIMARY container (sm-mongo1) ===
+  sm-mongo1 stopped. Waiting for election...
+  localhost:27018               (not reachable/healthy)
+  localhost:27019               PRIMARY
+  localhost:27020               SECONDARY
+
+=== 6. The API still works after failover ===
+  Created shift 6b039413e876fa3ebfabfc8b after failover - written to the NEW primary
+  GET /api/shifts returned 2 replica-test shift(s)
+
+=== 7. Restart the failed node - it rejoins and catches up ===
+  localhost:27018               PRIMARY
+  localhost:27019               SECONDARY
+  localhost:27020               SECONDARY
+
+=== Backend log (topology / primary changes) ===
+  [2026-11-23T01:16:53.399Z] [INFO] MongoDB topology: ReplicaSetWithPrimary (pool size 20, readPreference primary)
+  [2026-11-23T01:17:00.166Z] [WARN] MongoDB disconnected - waiting for a primary...
+  [2026-11-23T01:17:00.211Z] [INFO] Replica set PRIMARY is now localhost:27019
+  [2026-11-23T01:17:00.212Z] [INFO] MongoDB reconnected
+  [2026-11-23T01:17:23.352Z] [WARN] MongoDB disconnected - waiting for a primary...
+  [2026-11-23T01:17:23.381Z] [INFO] Replica set PRIMARY is now localhost:27018
+  [2026-11-23T01:17:23.381Z] [INFO] MongoDB reconnected
+
+=== Cleanup ===
+  Demo data removed
+  Backend stopped. The replica set keeps running (docker compose -f database/docker-compose.yml down to stop it).

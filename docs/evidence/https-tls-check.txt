@@ -1,0 +1,5 @@
+HTTPS check (backend started with HTTPS_KEY_FILE/HTTPS_CERT_FILE from npm run cert)
+ShiftManager Backend Running on Port 5443 (HTTPS)
+GET https://localhost:5443/api/health -> HTTPS status 200 | TLS TLSv1.3 | cipher TLS_AES_256_GCM_SHA384
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Plain HTTP request to the TLS port -> rejected (ECONNRESET)

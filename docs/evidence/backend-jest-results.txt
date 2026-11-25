@@ -1,0 +1,16 @@
+
+> shiftmanager-backend@1.0.0 test
+> node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand
+
+PASS tests/integration/auth.test.js
+PASS tests/integration/shifts.test.js
+PASS tests/integration/leaves.test.js
+PASS tests/integration/notifications.test.js
+PASS tests/unit/middlewareAndRules.test.js
+PASS tests/unit/validators.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       128 passed, 128 total
+Snapshots:   0 total
+Time:        7.288 s
+Ran all test suites.

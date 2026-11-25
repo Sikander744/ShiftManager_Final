@@ -1,0 +1,52 @@
+# MongoDB 3-node replica set for ShiftManager (database replication bonus)
+#
+# Start:   docker compose -f database/docker-compose.yml up -d
+# Init:    powershell -ExecutionPolicy Bypass -File database/setup-replica-set.ps1
+# Demo:    powershell -ExecutionPolicy Bypass -File database/replication-demo.ps1
+# Stop:    docker compose -f database/docker-compose.yml down        (add -v to delete data)
+#
+# Networking: the small "rs-net" container owns one shared network namespace and
+# publishes ports 27018-27020. The three mongod containers join that namespace, so
+# every member is reachable as localhost:<port> both from the other members and from
+# Windows. Stopping one mongod container (to simulate a failure) does not affect the others.
+name: shiftmanager-db
+
+services:
+  rs-net:
+    image: mongo:8.0
+    container_name: sm-rs-net
+    command: ["sleep", "infinity"]
+    ports: ["27018:27018", "27019:27019", "27020:27020"]
+    restart: unless-stopped
+
+  mongo1:
+    image: mongo:8.0
+    container_name: sm-mongo1
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
+    network_mode: "service:rs-net"
+    volumes: ["mongo1-data:/data/db"]
+    depends_on: [rs-net]
+    restart: unless-stopped
+
+  mongo2:
+    image: mongo:8.0
+    container_name: sm-mongo2
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27019"]
+    network_mode: "service:rs-net"
+    volumes: ["mongo2-data:/data/db"]
+    depends_on: [rs-net]
+    restart: unless-stopped
+
+  mongo3:
+    image: mongo:8.0
+    container_name: sm-mongo3
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27020"]
+    network_mode: "service:rs-net"
+    volumes: ["mongo3-data:/data/db"]
+    depends_on: [rs-net]
+    restart: unless-stopped
+
+volumes:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
